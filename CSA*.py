@@ -56,7 +56,7 @@ def angle_approximation(a):
         return a
     return a
 
-orientation = 14        
+orientation = 30        
 k = angle_approximation(orientation)                   # real value 
 
 
@@ -67,11 +67,11 @@ R2 = 100
 
 #ind1 = 2  #int(input('enter x coordinate of starting node'))  
 #ind2 = 2  #int(input('enter y coordinate of starting node'))  
-ind = (80,6,k)
+ind = (5,5,k)
 
 #goal1 = 20  #int(input('enter x coordinate of goal node'))  
 #goal2 = 20  #int(input('enter y coordinate of goal node'))  # 
-goal = (35,90)
+goal = (60,70)
 
 #d = int(input())
 
@@ -85,48 +85,105 @@ c = 1
 
 b = r+c
 
+def terrain(x,y):
+    
+    inclined_up = 1
+    inclined_down = 2
+    rough = 3
+    inclined_down_smooth = 4
+    inclined_down_rough = 5
+    inclined_up_rough = 6
+    inclined_up_smooth = 7
+    smooth = 8
+    
+    if (x>0) and (x<=15) and (y>0) and (y<=15):
+        return inclined_up_rough
+#    if (x>60) and (x<=75) and (y>0) and (y<=25):
+#        return inclined_down_rough
+    if (x>85) and (x<=100) and (y>0) and (y<=25):
+        return inclined_down_smooth
+    if (x>0) and (x<=15) and (y>25) and (y<=40):
+        return inclined_down
+    if (x>25) and (x<=45) and (y>25) and (y<=35):
+        return inclined_up
+    if (x>50) and (x<=75) and (y>25) and (y<=40):
+        return inclined_down_rough
+    if (x>75) and (x<=100) and (y>25) and (y<=40):
+        return rough
+    if (x>0) and (x<=25) and (y>55) and (y<=65):
+        return inclined_up_rough
+    if (x>25) and (x<=50) and (y>55) and (y<=70):
+        return inclined_down_smooth
+    if (x>50) and (x<=75) and (y>55) and (y<=70):
+        return inclined_up_smooth
+    if (x>75) and (x<=100) and (y>50) and (y<=65):
+        return smooth
+    if (x>0) and (x<=25) and (y>75) and (y<=100):
+        return inclined_up
+    if (x>25) and (x<=40) and (y>75) and (y<=100):
+        return rough
+    if (x>50) and (x<=75) and (y>75) and (y<=100):
+        return inclined_down
+
 
 def force(x,y):
     m = 1.8
     g = 9.8
     f = 0.1
+    f0 = 0.08
     f1 = 0.4
-    f2 = 0.7
+    #f2 = 0.7
     angle = 15
     
+    inclined_up = 1
+    inclined_down = 2
+    rough = 3
+    inclined_down_smooth = 4
+    inclined_down_rough = 5
+    inclined_up_rough = 6
+    inclined_up_smooth = 7
+    smooth = 8
     # F = f*N (f = coeff of friction) f = 0.1
     Force = 1.76
     F = Force
+    #return F
+    
+    
     
     if terrain(x,y) == inclined_up:
         # opposing force = m*g*sin(theta) - f*N
         F = m*g*math.sin(math.radians(angle)) + f*m*g*math.cos(math.radians(angle))
         return F
     if terrain(x,y) == inclined_down:
-        angle = angle_low
-        F = m*g*math.sin(math.radians(angle)) - f*m*g*math.cos(math.radians(angle))
+        F = m*g*math.sin(math.radians(-angle)) + f*m*g*math.cos(math.radians(angle))
         return F
     if terrain(x,y) == rough:
         F = f1*m*g
         return F
-    if terrain(x,y) == more_rough:
-        F = f2*m*g
-        return F
     if terrain(x,y) == smooth:
-        return None
+        F = f0*m*g
+        return F
+    if terrain(x,y) == inclined_down_smooth:
+        F = m*g*math.sin(math.radians(-angle)) + f0*m*g*math.cos(math.radians(angle))
+        return F
     if terrain(x,y) == inclined_up_rough:
         F = m*g*math.sin(math.radians(angle)) + f1*m*g*math.cos(math.radians(angle))
         return F
+    if terrain(x,y) == inclined_down_rough:
+        F = m*g*math.sin(math.radians(-angle)) + f1*m*g*math.cos(math.radians(angle))
+        return F
     if terrain(x,y) == inclined_up_smooth:
-        return None
+        F = m*g*math.sin(math.radians(angle)) + f0*m*g*math.cos(math.radians(angle))
+        return F
     else:
         return F
     
-def terrain(x,y):
-    pass
 
-def obstacle_here(i,j):    
-    pass
+def obstacle_here(x,y): 
+    
+    if x > 93 and x < 100 and y > 90 and y < 100:
+        return None
+    
     
     
 
@@ -142,7 +199,7 @@ if obstacle_here(goal[0],goal[1]):
 def action_one(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*0)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R1)/60  
     
@@ -155,7 +212,7 @@ def action_one(i,j,k,R1,R2):
     point2 = j
 
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 + u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 + u2)*(math.sin(math.radians(theta))*dt)
@@ -188,12 +245,12 @@ def action_one(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
         cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
-        Current_E = force_cost/d
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
     
@@ -201,7 +258,7 @@ def action_one(i,j,k,R1,R2):
 def action_two(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R1)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*0)/60
     
@@ -212,7 +269,7 @@ def action_two(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -245,12 +302,12 @@ def action_two(i,j,k,R1,R2):
     
     else:
     
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
 
@@ -259,7 +316,7 @@ def action_two(i,j,k,R1,R2):
 def action_three(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R1)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R1)/60  
     
@@ -271,7 +328,7 @@ def action_three(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -304,12 +361,12 @@ def action_three(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
 
@@ -317,7 +374,7 @@ def action_three(i,j,k,R1,R2):
 def action_four(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*0)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R2)/60    
     
@@ -329,7 +386,7 @@ def action_four(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -362,19 +419,19 @@ def action_four(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
     
 def action_five(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R2)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*0)/60  
     
@@ -386,7 +443,7 @@ def action_five(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -419,12 +476,12 @@ def action_five(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
     
@@ -432,7 +489,7 @@ def action_five(i,j,k,R1,R2):
 def action_six(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R2)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R2)/60
 
@@ -444,7 +501,7 @@ def action_six(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -477,12 +534,12 @@ def action_six(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
 
@@ -491,7 +548,7 @@ def action_six(i,j,k,R1,R2):
 def action_seven(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R1)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R2)/60   
     
@@ -503,7 +560,7 @@ def action_seven(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -536,12 +593,12 @@ def action_seven(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
 
@@ -549,7 +606,7 @@ def action_seven(i,j,k,R1,R2):
 def action_eight(i,j,k,R1,R2):
     l = 1.6
     r = 0.4
-    dt = 0.1
+    dt = 0.5
     u1 = (2*3.14*r*R2)/60   #R1 and R2 diff for every subfunction
     u2 = (2*3.14*r*R1)/60   
     
@@ -561,7 +618,7 @@ def action_eight(i,j,k,R1,R2):
     point1 = i
     point2 = j
         
-    for iterations in range(30):   # for 1 sec :- 0.05*20
+    for iterations in range(20):   # for 1 sec :- 0.05*20
 
         dj = (r/2)*(u1 +u2)*(math.cos(math.radians(theta))*dt)
         di = (r/2)*(u1 +u2)*(math.sin(math.radians(theta))*dt)
@@ -594,12 +651,12 @@ def action_eight(i,j,k,R1,R2):
     
     else:
         
-        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)
+        d = math.sqrt((i1 - point1)**2 + (j1 - point2)**2)/10
         force_cost = force(i1,j1)
-        heuristic = abs(goal[0] - i1) + abs(goal[1] - j1)
+        heuristic = (abs(goal[0] - i1) + abs(goal[1] - j1))/10
         cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] = cost_2_come[int(2*point1)][int(2*point2)][int(theta/5)] + d
-        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic
-        Current_E = force_cost/d
+        cost = cost_2_come[int(2*i1)][int(2*j1)][int(k1/5)] + heuristic + force_cost
+        Current_E = force_cost*d
         
         return (i1,j1,k1) , cost , (v,w) , Current_E
 
@@ -741,7 +798,7 @@ while len(index_queue) != 0 and not breakwhile:
     #print(neighbours_cost)
     
     #######
-    if math.sqrt((goal[0] - node[0])**2 + (goal[1] - node[1])**2) <= 5:
+    if math.sqrt((goal[0] - node[0])**2 + (goal[1] - node[1])**2) <= 10:
         print("goal reached")
         goal_ind = node
         final_velocity = velocity
@@ -810,4 +867,4 @@ for i in range(len(path_list)):
     energy_list.append(ener)
 
 energy_list.pop(0)
-
+print(energy_list)
