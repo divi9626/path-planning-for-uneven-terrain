@@ -35,7 +35,7 @@ The following are the project dependencies:
 </p>
 
 <p>
-    <img src="simulation/a*.png" width="640" height="480"alt>
+    <img src="simulation/astar.png" width="640" height="480"alt>
 </p>
 
 
@@ -45,7 +45,7 @@ The following are the project dependencies:
 </p>
 
 <p>
-    <img src="simulation/csa*.png" width="640" height="480"alt>
+    <img src="simulation/csastar.png" width="640" height="480"alt>
     
 </p>
 
